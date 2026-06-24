@@ -1,0 +1,15 @@
+{
+  "name": "one-now-booking-widget",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Embeddable 1Now Booking Engine widget — one script tag, any website. Standalone bundle (no framework), Shadow-DOM isolated, themed per company.",
+  "scripts": {
+    "build": "node build.mjs",
+    "dev": "node build.mjs --serve",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "esbuild": "^0.21.5",
+    "typescript": "^5.4.5"
+  }
+}

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Demo host site — 1Now widget</title>
+  <style>
+    /* Deliberately un-1Now styling to prove Shadow-DOM isolation. */
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Georgia, "Times New Roman", serif; color: #14243a; background: #0d1b2a; }
+    .hero { max-width: 1080px; margin: 0 auto; padding: 64px 24px; }
+    .badge { display:inline-block; font-family: Arial, sans-serif; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:#8fd0ff; border:1px solid #2c4a60; border-radius:999px; padding:6px 12px; }
+    h1 { color:#fff; font-size:42px; line-height:1.1; margin:18px 0 10px; }
+    p.lead { color:#b9c6d1; font-size:18px; max-width:560px; }
+    .mount { margin-top:36px; }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <span class="badge">Some third-party website</span>
+    <h1>Plan your Orlando road trip 🌴</h1>
+    <p class="lead">This page is intentionally nothing like 1Now. The booking bar below is the embedded widget — added with one script tag, themed from the company, isolated in a Shadow DOM.</p>
+
+    <div class="mount">
+      <!-- ===== THE ONLY 1NOW CODE ON THIS PAGE ===== -->
+      <!-- data-mode="page" (default): search bar + preview here; picking a car
+           navigates to the booking app as a full NEXT PAGE. Alternatives:
+           data-mode="modal" (overlay) or data-mode="full" (embed whole app inline).
+           data-booking-url points at the hosted Template-1Now-FE app. -->
+      <div id="onenow-booking-engine"></div>
+      <script
+        src="/dist/widget.js"
+        data-company-id="233"
+        data-api-url="https://api-fleet-management.1now.app"
+        data-booking-url="http://localhost:3000"
+        data-booking-path="/available-car"
+        data-target="onenow-booking-engine"
+        data-title="Book your vehicle"
+        data-show-fleet="true"
+        defer></script>
+      <!-- ============================================ -->
+    </div>
+  </div>
+</body>
+</html>
