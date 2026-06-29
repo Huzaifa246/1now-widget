@@ -285,7 +285,6 @@ export function renderWidget(opts: {
       : dropoffLocs.find((l) => String(l.id) === state.dropoffId);
 
     const data: Record<string, string> = {
-      company_id: cfg.companyId,
       pickup_location_id: state.pickupId,
       dropoff_location_id: state.sameDropoff ? state.pickupId : state.dropoffId,
       pickup_location: pickupLoc?.name || pickupLoc?.address || "",
@@ -312,7 +311,9 @@ export function renderWidget(opts: {
   // Current selection as URL params (loose — no validation). Lets the fleet
   // preview carry any chosen location/dates to a car's detail page on click.
   function getQuery(): Record<string, string> {
-    const p: Record<string, string> = { company_id: cfg.companyId };
+    // No company_id in the redirect — the booking app resolves the company from
+    // its own domain. The widget still uses company_id for its own data calls.
+    const p: Record<string, string> = {};
     if (state.pickupId) {
       p.pickup_location_id = state.pickupId;
       p.dropoff_location_id = state.sameDropoff ? state.pickupId : state.dropoffId;
@@ -401,14 +402,14 @@ export function renderFleetPreview(
 
   const goToEngine = (): void => {
     const base = cfg.bookingUrl.replace(/\/+$/, "");
-    nav(`${base}/vehicles?company_id=${encodeURIComponent(cfg.companyId)}`);
+    nav(`${base}/vehicles`);
   };
 
   // Clicking a card opens that car's detail page on the engine, carrying the
   // company + any location/dates already chosen in the bar.
   const goToCar = (carId: number): void => {
     const base = cfg.bookingUrl.replace(/\/+$/, "");
-    const params = getQuery ? getQuery() : { company_id: cfg.companyId };
+    const params = getQuery ? getQuery() : {};
     params.selectedCarId = String(carId);
     const qs = Object.keys(params)
       .filter((k) => params[k] !== "" && params[k] != null)

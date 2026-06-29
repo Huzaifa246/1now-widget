@@ -1,5 +1,620 @@
 /* 1Now Booking Engine widget — https://1now.ai — embed on any site. */
-"use strict";(()=>{function Q(t){let e=window.OneNowBookingConfig||{},a=(g,f="")=>{let p=t==null?void 0:t.getAttribute(g);return p!=null?p:f},o=g=>typeof e[g]=="string"?e[g]:"",m=g=>e[g]===!0?"true":"",n=a("data-mode",o("mode")||"page").toLowerCase(),s=n==="full"?"full":n==="modal"?"modal":"page";return{companyId:a("data-company-id",o("companyId")),apiUrl:a("data-api-url",o("apiUrl")||"https://api-fleet-management.1now.app").replace(/\/+$/,""),mode:s,bookingUrl:a("data-booking-url",o("bookingUrl")||"https://book.1now.ai"),bookingPath:a("data-booking-path",o("bookingPath")||"/available-car"),target:a("data-target",o("target")),showFleet:a("data-show-fleet",m("showFleet"))==="true",openInNewTab:a("data-target-blank",m("openInNewTab"))==="true",title:a("data-title",o("title")),imageBase:a("data-image-base",o("imageBase")||"https://fleet-management-images-upload-be.s3.amazonaws.com").replace(/\/+$/,"")}}async function U(t){let e=await fetch(t,{headers:{Accept:"application/json"}});if(!e.ok)throw new Error("HTTP "+e.status);return e.json()}function K(t){if(Array.isArray(t))return t;let e=t;return e&&Array.isArray(e.data)?e.data:e&&Array.isArray(e.results)?e.results:[]}async function Z(t){let e=await U(`${t.apiUrl}/api/company/locations/?company_id=${encodeURIComponent(t.companyId)}`);return K(e).filter(a=>a&&a.active!==!1&&!a.removed)}async function G(t){let e=await U(`${t.apiUrl}/api/fleet/?company_id=${encodeURIComponent(t.companyId)}`);return K(e).filter(a=>a&&a.active!==!1&&!a.removed)}async function X(t){try{let e=await U(`${t.apiUrl}/api/website/details/?company_id=${encodeURIComponent(t.companyId)}`);return e&&typeof e=="object"&&"success"in e&&"data"in e?e.data:e}catch(e){return null}}function W(t){let e=(t||"").replace("#","").trim(),a=e.length===3?e.split("").map(m=>m+m).join(""):e,o=parseInt(a,16);return Number.isNaN(o)?"15, 61, 62":`${o>>16&255}, ${o>>8&255}, ${o&255}`}function j(t){let e=t/255;return e<=.03928?e/12.92:Math.pow((e+.055)/1.055,2.4)}function ee(t){let e=parseInt(t.replace("#",""),16);return .2126*j(e>>16&255)+.7152*j(e>>8&255)+.0722*j(e&255)}function te(t,e){let a=ee(t),o=ee(e);return(Math.max(a,o)+.05)/(Math.min(a,o)+.05)}function le(t){return te(t,"#FFFFFF")>=te(t,"#111827")?"#FFFFFF":"#111827"}var z=t=>typeof t=="string"?t.trim():"";function ne(t){let e=t||{},a=z(e.primary_color)||z(e.button_color)||"#FE7743",o=z(e.text_color)||"#1F2937",m=z(e.font_family)||"Urbanist";return{primary:a,onPrimary:le(a),text:o,font:m}}function oe(t,e){t.style.setProperty("--onb-primary",W(e.primary)),t.style.setProperty("--onb-on-primary",W(e.onPrimary)),t.style.setProperty("--onb-text",W(e.text)),t.style.setProperty("--onb-font",`'${e.font}', system-ui, -apple-system, sans-serif`)}function re(t){let e=(t||"Urbanist").trim(),a="onb-font-"+e.replace(/\s+/g,"-").toLowerCase();if(document.getElementById(a))return;let o=document.createElement("link");o.id=a,o.rel="stylesheet",o.href=`https://fonts.googleapis.com/css2?family=${e.replace(/\s+/g,"+")}:wght@400;500;600;700;800&display=swap`,document.head.appendChild(o)}var de=["Su","Mo","Tu","We","Th","Fr","Sa"],pe=["January","February","March","April","May","June","July","August","September","October","November","December"];function O(t){return new Date(t.getFullYear(),t.getMonth(),t.getDate())}function ge(t){return new Date(t.getFullYear(),t.getMonth(),1)}function Y(t,e){return new Date(t.getFullYear(),t.getMonth()+e,1)}function V(t,e){return!!t&&!!e&&t.getFullYear()===e.getFullYear()&&t.getMonth()===e.getMonth()&&t.getDate()===e.getDate()}function ae(t){var p;let e=(p=t.months)!=null?p:2,a=O(new Date),o={start:t.initial.start?O(t.initial.start):null,end:t.initial.end?O(t.initial.end):null},m=ge(o.start||a),n=document.createElement("div");n.className="onb-cals";function s(l){var c;!o.start||o.start&&o.end?(o.start=l,o.end=null):l.getTime()<o.start.getTime()?o.start=l:o.end=l,(c=t.onChange)==null||c.call(t,{...o}),f()}function g(l){let c=document.createElement("div");c.className="onb-cal";let b=document.createElement("div");b.className="onb-cal-head";let i=document.createElement("button");i.className="onb-nav",i.type="button",i.setAttribute("aria-label","Previous month"),i.textContent="\u2039",i.onclick=()=>{m=Y(m,-1),f()};let C=document.createElement("div");C.className="onb-cal-title",C.textContent=`${pe[l.getMonth()]} ${l.getFullYear()}`;let d=document.createElement("button");d.className="onb-nav",d.type="button",d.setAttribute("aria-label","Next month"),d.textContent="\u203A",d.onclick=()=>{m=Y(m,1),f()},b.append(i,C,d);let T=document.createElement("div");T.className="onb-grid",de.forEach(x=>{let u=document.createElement("div");u.className="onb-dow",u.textContent=x,T.appendChild(u)});let h=new Date(l.getFullYear(),l.getMonth(),1).getDay(),I=new Date(l.getFullYear(),l.getMonth()+1,0).getDate();for(let x=0;x<h;x++){let u=document.createElement("div");u.className="onb-day blank",T.appendChild(u)}for(let x=1;x<=I;x++){let u=new Date(l.getFullYear(),l.getMonth(),x),$=document.createElement("button");$.type="button",$.className="onb-day",$.textContent=String(x),u.getTime()<a.getTime()?$.disabled=!0:$.onclick=()=>s(u);let N=V(u,o.start),L=V(u,o.end);o.start&&o.end&&u.getTime()>o.start.getTime()&&u.getTime()<o.end.getTime()&&$.classList.add("in-range"),(N||L)&&($.classList.add("cap"),o.start&&o.end&&!V(o.start,o.end)?$.classList.add(N?"start":"end"):$.classList.add("only")),T.appendChild($)}return c.append(b,T),c}function f(){n.innerHTML="";for(let l=0;l<e;l++)n.appendChild(g(Y(m,l)))}return f(),{el:n,getRange:()=>({...o})}}var ie=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],S=t=>String(t).padStart(2,"0"),B=t=>`${t.getFullYear()}-${S(t.getMonth()+1)}-${S(t.getDate())}`;function be(t){if(!t.start)return"Add dates";let e=`${ie[t.start.getMonth()]} ${t.start.getDate()}`;return t.end?`${e} \u2013 ${ie[t.end.getMonth()]} ${t.end.getDate()}`:`${e} \u2014 \u2026`}function F(t){let[e,a]=t.split(":").map(Number),o=e<12?"AM":"PM";return`${e%12===0?12:e%12}:${S(a)} ${o}`}function ue(){let t=[];for(let e=0;e<24;e++)for(let a of[0,30]){let o=`${S(e)}:${S(a)}`;t.push({value:o,label:F(o)})}return t}function q(t){let{config:e,locations:a}=t,o=a.filter(r=>r.location_type==="pick_up"||r.location_type==="both"||!r.location_type),m=a.filter(r=>r.location_type==="drop_off"||r.location_type==="both"||!r.location_type),n={sameDropoff:!0,pickupId:"",dropoffId:"",range:{start:null,end:null},pickupTime:"10:00",returnTime:"10:00"},s=document.createElement("div");if(s.className="onb-root",e.title){let r=document.createElement("h3");r.className="onb-title",r.textContent=e.title,s.appendChild(r)}let g=document.createElement("div");g.className="onb-toggle";let f=document.createElement("button");f.type="button",f.textContent="Same drop off";let p=document.createElement("button");p.type="button",p.textContent="Different drop off",g.append(f,p),s.appendChild(g);let l=document.createElement("div");l.className="onb-bar",s.appendChild(l);function c(r,v,w){let E=document.createElement("label");E.className="onb-seg";let _=document.createElement("span");_.className="onb-seg-label",_.textContent=r;let k=document.createElement("select"),M=document.createElement("option");return M.value="",M.textContent="Where are you going?",k.appendChild(M),v.forEach(y=>{let D=document.createElement("option");D.value=String(y.id),D.textContent=y.name||y.address||`Location ${y.id}`,k.appendChild(D)}),k.onchange=()=>{let y=v.find(D=>String(D.id)===k.value);w(k.value,y)},E.append(_,k),E}let b=c("Pick-up location",o,r=>{n.pickupId=r}),i=c("Drop-off location",m,r=>{n.dropoffId=r});function C(r,v){let w=document.createElement("button");w.type="button",w.className="onb-seg";let E=document.createElement("span");E.className="onb-seg-label",E.textContent=r;let _=document.createElement("span");_.className="onb-seg-value placeholder",_.textContent=v;let k=document.createElement("div");return k.className="onb-pop",k.hidden=!0,w.append(E,_,k),{seg:w,value:_,pop:k}}let d=C("Pickup & drop-off date","Add dates"),T=ae({initial:n.range,months:2,onChange:r=>{n.range=r,d.value.textContent=be(r),d.value.classList.toggle("placeholder",!r.start),r.start&&r.end&&L()}});d.pop.appendChild(T.el);let h=C("Pick-up \u2013 drop-off","10:00 AM \u2013 10:00 PM");n.returnTime="10:00";function I(){let r=document.createElement("div");r.className="onb-time";let v=(E,_,k)=>{let M=document.createElement("div"),y=document.createElement("label");y.textContent=E;let D=document.createElement("select");return ue().forEach(H=>{let A=document.createElement("option");A.value=H.value,A.textContent=H.label,H.value===_&&(A.selected=!0),D.appendChild(A)}),D.onchange=()=>{k(D.value),h.value.textContent=`${F(n.pickupTime)} \u2013 ${F(n.returnTime)}`,h.value.classList.remove("placeholder")},M.append(y,D),M};r.append(v("Pick-up time",n.pickupTime,E=>n.pickupTime=E),v("Drop-off time",n.returnTime,E=>n.returnTime=E));let w=document.createElement("button");w.type="button",w.className="onb-pop-done",w.textContent="Done",w.onclick=()=>L(),h.pop.append(r,w)}I(),h.value.textContent=`${F(n.pickupTime)} \u2013 ${F(n.returnTime)}`,h.value.classList.remove("placeholder");let x=document.createElement("button");x.type="button",x.className="onb-search",x.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><span>Search</span>',l.append(b,i,d.seg,h.seg,x);let u=document.createElement("div");u.className="onb-error",s.appendChild(u);let $=document.createElement("div");$.className="onb-fleet",$.hidden=!0,s.appendChild($);let R=document.createElement("div");R.className="onb-footer",R.textContent="Powered by 1Now",s.appendChild(R);function N(){f.setAttribute("aria-pressed",String(n.sameDropoff)),p.setAttribute("aria-pressed",String(!n.sameDropoff)),i.style.display=n.sameDropoff?"none":""}f.onclick=()=>{n.sameDropoff=!0,N()},p.onclick=()=>{n.sameDropoff=!1,N()},N();function L(){d.pop.hidden=!0,h.pop.hidden=!0}function P(r){let v=!r.hidden;L(),r.hidden=v}d.seg.addEventListener("click",r=>{d.pop.contains(r.target)||P(d.pop)}),h.seg.addEventListener("click",r=>{h.pop.contains(r.target)||P(h.pop)}),document.addEventListener("click",r=>{let v=r.composedPath();!v.includes(d.seg)&&!v.includes(h.seg)&&L()}),x.onclick=()=>{if(u.textContent="",!e.companyId){u.textContent="Configuration error: missing Company ID.";return}if(!n.pickupId){u.textContent="Please choose a pick-up location.";return}if(!n.sameDropoff&&!n.dropoffId){u.textContent="Please choose a drop-off location.";return}if(!n.range.start||!n.range.end){u.textContent="Please choose pick-up and drop-off dates.",P(d.pop);return}let r=o.find(y=>String(y.id)===n.pickupId),v=n.sameDropoff?r:m.find(y=>String(y.id)===n.dropoffId),w={company_id:e.companyId,pickup_location_id:n.pickupId,dropoff_location_id:n.sameDropoff?n.pickupId:n.dropoffId,pickup_location:(r==null?void 0:r.name)||(r==null?void 0:r.address)||"",dropoff_location:(v==null?void 0:v.name)||(v==null?void 0:v.address)||"",pickup_date:`${B(n.range.start)}T${n.pickupTime}`,return_date:`${B(n.range.end)}T${n.returnTime}`};me(e,w);let E=e.bookingUrl.replace(/\/+$/,""),_=e.bookingPath?e.bookingPath.charAt(0)==="/"?e.bookingPath:"/"+e.bookingPath:"",k=Object.keys(w).filter(y=>w[y]!==""&&w[y]!=null).map(y=>`${encodeURIComponent(y)}=${encodeURIComponent(w[y])}`).join("&"),M=E+_+(k?"?"+k:"");t.openUrl(M)};function ce(){let r={company_id:e.companyId};return n.pickupId&&(r.pickup_location_id=n.pickupId,r.dropoff_location_id=n.sameDropoff?n.pickupId:n.dropoffId),n.range.start&&n.range.end&&(r.pickup_date=`${B(n.range.start)}T${n.pickupTime}`,r.return_date=`${B(n.range.end)}T${n.returnTime}`),r}return t.root.appendChild(s),{root:s,getQuery:ce}}function me(t,e){var a;try{let o=window.posthog;(a=o==null?void 0:o.capture)==null||a.call(o,"booking_widget_search",{company_id:t.companyId,pickup_location_id:e.pickup_location_id,dropoff_location_id:e.dropoff_location_id,pickup_date:e.pickup_date,return_date:e.return_date})}catch(o){}}var fe='<svg viewBox="0 0 24 24" fill="#c01c84" aria-hidden="true"><path d="M12 2c.9 2.7 2.9 4.7 5.6 5.6-2.7.9-4.7 2.9-5.6 5.6-.9-2.7-2.9-4.7-5.6-5.6C9.1 6.7 11.1 4.7 12 2z"/></svg>';function se(t,e,a,o,m){if(!a.length){t.hidden=!0;return}t.hidden=!1;let n=i=>i?/^https?:\/\//i.test(i)?i:`${e.imageBase}/${i.replace(/^\/+/,"")}`:"",s=i=>String(i).replace(/[&<>"']/g,C=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[C]),g=8,f=i=>{var x;let C=(x=i.avg_car_price_per_day)!=null?x:i.price,d=i.name||[i.year,i.make,i.model].filter(Boolean).join(" ")||"Vehicle",T=(i.seats?`${i.seats} seats `:"")+(i.color?`<b>${s(i.color)}</b> color`:""),h=n(i.thumbnail_photo_url),I=i.has_bonzah_insurance?`<div class="onb-badge">${fe}Bonzah available</div>`:"";return'<div class="onb-car"><div class="onb-car-imgwrap">'+(h?`<img src="${s(h)}" alt="" loading="lazy">`:'<div class="ph"></div>')+I+`</div><div class="onb-car-b"><div class="onb-car-n">${s(d)}</div><div class="onb-car-m">${T}</div>`+(C!=null?`<div class="onb-car-p">$${s(C)} <span>/day</span></div>`:"")+"</div></div>"},p=i=>{m?m(i):e.openInNewTab?window.open(i,"_blank","noopener"):window.location.href=i},l=()=>{let i=e.bookingUrl.replace(/\/+$/,"");p(`${i}/vehicles?company_id=${encodeURIComponent(e.companyId)}`)},c=i=>{let C=e.bookingUrl.replace(/\/+$/,""),d=o?o():{company_id:e.companyId};d.selectedCarId=String(i);let T=Object.keys(d).filter(h=>d[h]!==""&&d[h]!=null).map(h=>`${encodeURIComponent(h)}=${encodeURIComponent(d[h])}`).join("&");p(`${C}/car-listing-detail?${T}`)},b=()=>{let i=a.slice(0,g),C=g<a.length?'<button type="button" data-act="more">View more</button>':"";t.innerHTML=`<div class="onb-fleet-head"><div class="onb-fleet-h">Explore All Vehicles (${a.length})</div></div><div class="onb-fleet-grid">${i.map(f).join("")}</div><div class="onb-fleet-actions">${C}<button type="button" data-act="all">View all</button></div>`;let d=t.querySelector('[data-act="more"]');d&&(d.onclick=()=>{g+=8,b()});let T=t.querySelector('[data-act="all"]');T&&(T.onclick=l),t.querySelectorAll(".onb-car").forEach((I,x)=>{let u=i[x];u&&(I.onclick=()=>c(u.id))})};b()}var J=`
+"use strict";
+(() => {
+  // src/config.ts
+  function resolveConfig(scriptEl) {
+    const g = window.OneNowBookingConfig || {};
+    const attr = (name, fallback = "") => {
+      const v = scriptEl == null ? void 0 : scriptEl.getAttribute(name);
+      return v != null ? v : fallback;
+    };
+    const gstr = (k) => typeof g[k] === "string" ? g[k] : "";
+    const gbool = (k) => g[k] === true ? "true" : "";
+    const modeRaw = attr("data-mode", gstr("mode") || "page").toLowerCase();
+    const mode = modeRaw === "full" ? "full" : modeRaw === "modal" ? "modal" : "page";
+    const TEST_COMPANY_ID = "233";
+    const TEST_BOOKING_URL = "https://qawebsitee.1now.app";
+    const companyIdGiven = attr("data-company-id", gstr("companyId"));
+    const bookingUrlGiven = attr("data-booking-url", gstr("bookingUrl"));
+    const companyId = companyIdGiven || TEST_COMPANY_ID;
+    const bookingUrl = bookingUrlGiven || TEST_BOOKING_URL;
+    if (!companyIdGiven) {
+      console.warn(
+        `[1Now widget] No company id set (data-company-id) \u2014 using TEST company ${TEST_COMPANY_ID}. Set your own company id before production.`
+      );
+    }
+    if (!bookingUrlGiven) {
+      console.warn(
+        `[1Now widget] No booking URL set (data-booking-url) \u2014 using TEST site ${TEST_BOOKING_URL}. Set your booking URL before production.`
+      );
+    }
+    return {
+      companyId,
+      apiUrl: attr(
+        "data-api-url",
+        gstr("apiUrl") || "https://api-fleet-management.1now.app"
+      ).replace(/\/+$/, ""),
+      mode,
+      bookingUrl,
+      bookingPath: attr("data-booking-path", gstr("bookingPath") || "/available-car"),
+      target: attr("data-target", gstr("target")),
+      showFleet: attr("data-show-fleet", gbool("showFleet")) === "true",
+      openInNewTab: attr("data-target-blank", gbool("openInNewTab")) === "true",
+      title: attr("data-title", gstr("title")),
+      imageBase: attr(
+        "data-image-base",
+        gstr("imageBase") || "https://fleet-management-images-upload-be.s3.amazonaws.com"
+      ).replace(/\/+$/, "")
+    };
+  }
+
+  // src/api.ts
+  async function getJson(url) {
+    const res = await fetch(url, { headers: { Accept: "application/json" } });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    return res.json();
+  }
+  function toArray(payload) {
+    if (Array.isArray(payload)) return payload;
+    const p = payload;
+    if (p && Array.isArray(p.data)) return p.data;
+    if (p && Array.isArray(p.results)) return p.results;
+    return [];
+  }
+  async function fetchLocations(cfg) {
+    const data = await getJson(
+      `${cfg.apiUrl}/api/company/locations/?company_id=${encodeURIComponent(cfg.companyId)}`
+    );
+    return toArray(data).filter(
+      (l) => l && l.active !== false && !l.removed
+    );
+  }
+  async function fetchFleet(cfg) {
+    const data = await getJson(
+      `${cfg.apiUrl}/api/fleet/?company_id=${encodeURIComponent(cfg.companyId)}`
+    );
+    return toArray(data).filter(
+      (v) => v && v.active !== false && !v.removed
+    );
+  }
+  async function fetchTheme(cfg) {
+    try {
+      const data = await getJson(
+        `${cfg.apiUrl}/api/website/details/?company_id=${encodeURIComponent(cfg.companyId)}`
+      );
+      if (data && typeof data === "object" && "success" in data && "data" in data) {
+        return data.data;
+      }
+      return data;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // src/theme.ts
+  function hexToRgb(hex) {
+    const h = (hex || "").replace("#", "").trim();
+    const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+    const n = parseInt(full, 16);
+    if (Number.isNaN(n)) return "15, 61, 62";
+    return `${n >> 16 & 255}, ${n >> 8 & 255}, ${n & 255}`;
+  }
+  function channel(c) {
+    const s = c / 255;
+    return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+  }
+  function luminance(hex) {
+    const n = parseInt(hex.replace("#", ""), 16);
+    return 0.2126 * channel(n >> 16 & 255) + 0.7152 * channel(n >> 8 & 255) + 0.0722 * channel(n & 255);
+  }
+  function contrast(a, b) {
+    const la = luminance(a);
+    const lb = luminance(b);
+    return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+  }
+  function onPrimary(primaryHex) {
+    return contrast(primaryHex, "#FFFFFF") >= contrast(primaryHex, "#111827") ? "#FFFFFF" : "#111827";
+  }
+  var str = (v) => typeof v === "string" ? v.trim() : "";
+  function buildTheme(details) {
+    const d = details || {};
+    const primary = str(d.primary_color) || str(d.button_color) || "#FE7743";
+    const text = str(d.text_color) || "#1F2937";
+    const font = str(d.font_family) || "Urbanist";
+    return { primary, onPrimary: onPrimary(primary), text, font };
+  }
+  function applyTheme(host, t) {
+    host.style.setProperty("--onb-primary", hexToRgb(t.primary));
+    host.style.setProperty("--onb-on-primary", hexToRgb(t.onPrimary));
+    host.style.setProperty("--onb-text", hexToRgb(t.text));
+    host.style.setProperty("--onb-font", `'${t.font}', system-ui, -apple-system, sans-serif`);
+  }
+  function ensureFont(fontFamily) {
+    const name = (fontFamily || "Urbanist").trim();
+    const id = "onb-font-" + name.replace(/\s+/g, "-").toLowerCase();
+    if (document.getElementById(id)) return;
+    const link = document.createElement("link");
+    link.id = id;
+    link.rel = "stylesheet";
+    link.href = `https://fonts.googleapis.com/css2?family=${name.replace(
+      /\s+/g,
+      "+"
+    )}:wght@400;500;600;700;800&display=swap`;
+    document.head.appendChild(link);
+  }
+
+  // src/calendar.ts
+  var DOW = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+  var MONTHS = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
+  ];
+  function startOfDay(d) {
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  }
+  function startOfMonth(d) {
+    return new Date(d.getFullYear(), d.getMonth(), 1);
+  }
+  function addMonths(d, n) {
+    return new Date(d.getFullYear(), d.getMonth() + n, 1);
+  }
+  function sameDay(a, b) {
+    return !!a && !!b && a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+  }
+  function createRangeCalendar(opts) {
+    var _a;
+    const months = (_a = opts.months) != null ? _a : 2;
+    const today = startOfDay(/* @__PURE__ */ new Date());
+    const range = {
+      start: opts.initial.start ? startOfDay(opts.initial.start) : null,
+      end: opts.initial.end ? startOfDay(opts.initial.end) : null
+    };
+    let view = startOfMonth(range.start || today);
+    const root = document.createElement("div");
+    root.className = "onb-cals";
+    function pick(day) {
+      var _a2;
+      if (!range.start || range.start && range.end) {
+        range.start = day;
+        range.end = null;
+      } else if (day.getTime() < range.start.getTime()) {
+        range.start = day;
+      } else {
+        range.end = day;
+      }
+      (_a2 = opts.onChange) == null ? void 0 : _a2.call(opts, { ...range });
+      render();
+    }
+    function monthEl(base) {
+      const wrap = document.createElement("div");
+      wrap.className = "onb-cal";
+      const head = document.createElement("div");
+      head.className = "onb-cal-head";
+      const prev = document.createElement("button");
+      prev.className = "onb-nav";
+      prev.type = "button";
+      prev.setAttribute("aria-label", "Previous month");
+      prev.textContent = "\u2039";
+      prev.onclick = () => {
+        view = addMonths(view, -1);
+        render();
+      };
+      const title = document.createElement("div");
+      title.className = "onb-cal-title";
+      title.textContent = `${MONTHS[base.getMonth()]} ${base.getFullYear()}`;
+      const next = document.createElement("button");
+      next.className = "onb-nav";
+      next.type = "button";
+      next.setAttribute("aria-label", "Next month");
+      next.textContent = "\u203A";
+      next.onclick = () => {
+        view = addMonths(view, 1);
+        render();
+      };
+      head.append(prev, title, next);
+      const grid = document.createElement("div");
+      grid.className = "onb-grid";
+      DOW.forEach((d) => {
+        const c = document.createElement("div");
+        c.className = "onb-dow";
+        c.textContent = d;
+        grid.appendChild(c);
+      });
+      const firstDow = new Date(base.getFullYear(), base.getMonth(), 1).getDay();
+      const daysInMonth = new Date(base.getFullYear(), base.getMonth() + 1, 0).getDate();
+      for (let i = 0; i < firstDow; i++) {
+        const b = document.createElement("div");
+        b.className = "onb-day blank";
+        grid.appendChild(b);
+      }
+      for (let dnum = 1; dnum <= daysInMonth; dnum++) {
+        const day = new Date(base.getFullYear(), base.getMonth(), dnum);
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "onb-day";
+        btn.textContent = String(dnum);
+        const past = day.getTime() < today.getTime();
+        if (past) {
+          btn.disabled = true;
+        } else {
+          btn.onclick = () => pick(day);
+        }
+        const isStart = sameDay(day, range.start);
+        const isEnd = sameDay(day, range.end);
+        const inRange = range.start && range.end && day.getTime() > range.start.getTime() && day.getTime() < range.end.getTime();
+        if (inRange) btn.classList.add("in-range");
+        if (isStart || isEnd) {
+          btn.classList.add("cap");
+          if (range.start && range.end && !sameDay(range.start, range.end)) {
+            btn.classList.add(isStart ? "start" : "end");
+          } else {
+            btn.classList.add("only");
+          }
+        }
+        grid.appendChild(btn);
+      }
+      wrap.append(head, grid);
+      return wrap;
+    }
+    function render() {
+      root.innerHTML = "";
+      for (let m = 0; m < months; m++) {
+        root.appendChild(monthEl(addMonths(view, m)));
+      }
+    }
+    render();
+    return { el: root, getRange: () => ({ ...range }) };
+  }
+
+  // src/ui.ts
+  var MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  var pad = (n) => String(n).padStart(2, "0");
+  var ymd = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  function fmtRange(r) {
+    if (!r.start) return "Add dates";
+    const s = `${MON[r.start.getMonth()]} ${r.start.getDate()}`;
+    if (!r.end) return `${s} \u2014 \u2026`;
+    return `${s} \u2013 ${MON[r.end.getMonth()]} ${r.end.getDate()}`;
+  }
+  function to12h(hhmm) {
+    const [h, m] = hhmm.split(":").map(Number);
+    const ap = h < 12 ? "AM" : "PM";
+    const h12 = h % 12 === 0 ? 12 : h % 12;
+    return `${h12}:${pad(m)} ${ap}`;
+  }
+  function timeOptions() {
+    const out = [];
+    for (let h = 0; h < 24; h++) {
+      for (const m of [0, 30]) {
+        const v = `${pad(h)}:${pad(m)}`;
+        out.push({ value: v, label: to12h(v) });
+      }
+    }
+    return out;
+  }
+  function renderWidget(opts) {
+    const { config: cfg, locations } = opts;
+    const pickupLocs = locations.filter(
+      (l) => l.location_type === "pick_up" || l.location_type === "both" || !l.location_type
+    );
+    const dropoffLocs = locations.filter(
+      (l) => l.location_type === "drop_off" || l.location_type === "both" || !l.location_type
+    );
+    const state = {
+      sameDropoff: true,
+      pickupId: "",
+      dropoffId: "",
+      range: { start: null, end: null },
+      pickupTime: "10:00",
+      returnTime: "10:00"
+    };
+    const root = document.createElement("div");
+    root.className = "onb-root";
+    if (cfg.title) {
+      const h = document.createElement("h3");
+      h.className = "onb-title";
+      h.textContent = cfg.title;
+      root.appendChild(h);
+    }
+    const toggle = document.createElement("div");
+    toggle.className = "onb-toggle";
+    const sameBtn = document.createElement("button");
+    sameBtn.type = "button";
+    sameBtn.textContent = "Same drop off";
+    const diffBtn = document.createElement("button");
+    diffBtn.type = "button";
+    diffBtn.textContent = "Different drop off";
+    toggle.append(sameBtn, diffBtn);
+    root.appendChild(toggle);
+    const bar = document.createElement("div");
+    bar.className = "onb-bar";
+    root.appendChild(bar);
+    function locationSeg(label, list, onChange) {
+      const seg = document.createElement("label");
+      seg.className = "onb-seg";
+      const lab = document.createElement("span");
+      lab.className = "onb-seg-label";
+      lab.textContent = label;
+      const sel = document.createElement("select");
+      const opt0 = document.createElement("option");
+      opt0.value = "";
+      opt0.textContent = "Where are you going?";
+      sel.appendChild(opt0);
+      list.forEach((l) => {
+        const o = document.createElement("option");
+        o.value = String(l.id);
+        o.textContent = l.name || l.address || `Location ${l.id}`;
+        sel.appendChild(o);
+      });
+      sel.onchange = () => {
+        const loc = list.find((l) => String(l.id) === sel.value);
+        onChange(sel.value, loc);
+      };
+      seg.append(lab, sel);
+      return seg;
+    }
+    const pickupSeg = locationSeg("Pick-up location", pickupLocs, (id) => {
+      state.pickupId = id;
+    });
+    const dropoffSeg = locationSeg("Drop-off location", dropoffLocs, (id) => {
+      state.dropoffId = id;
+    });
+    function fieldSeg(label, initialValue) {
+      const seg = document.createElement("button");
+      seg.type = "button";
+      seg.className = "onb-seg";
+      const lab = document.createElement("span");
+      lab.className = "onb-seg-label";
+      lab.textContent = label;
+      const value = document.createElement("span");
+      value.className = "onb-seg-value placeholder";
+      value.textContent = initialValue;
+      const pop = document.createElement("div");
+      pop.className = "onb-pop";
+      pop.hidden = true;
+      seg.append(lab, value, pop);
+      return { seg, value, pop };
+    }
+    const dateField = fieldSeg("Pickup & drop-off date", "Add dates");
+    const cal = createRangeCalendar({
+      initial: state.range,
+      months: 2,
+      onChange: (r) => {
+        state.range = r;
+        dateField.value.textContent = fmtRange(r);
+        dateField.value.classList.toggle("placeholder", !r.start);
+        if (r.start && r.end) closePops();
+      }
+    });
+    dateField.pop.appendChild(cal.el);
+    const timeField = fieldSeg("Pick-up \u2013 drop-off", "10:00 AM \u2013 10:00 PM");
+    state.returnTime = "10:00";
+    function buildTimePop() {
+      const wrap = document.createElement("div");
+      wrap.className = "onb-time";
+      const mk = (labelText, val, set) => {
+        const box = document.createElement("div");
+        const lb = document.createElement("label");
+        lb.textContent = labelText;
+        const sel = document.createElement("select");
+        timeOptions().forEach((o) => {
+          const op = document.createElement("option");
+          op.value = o.value;
+          op.textContent = o.label;
+          if (o.value === val) op.selected = true;
+          sel.appendChild(op);
+        });
+        sel.onchange = () => {
+          set(sel.value);
+          timeField.value.textContent = `${to12h(state.pickupTime)} \u2013 ${to12h(state.returnTime)}`;
+          timeField.value.classList.remove("placeholder");
+        };
+        box.append(lb, sel);
+        return box;
+      };
+      wrap.append(
+        mk("Pick-up time", state.pickupTime, (v) => state.pickupTime = v),
+        mk("Drop-off time", state.returnTime, (v) => state.returnTime = v)
+      );
+      const done = document.createElement("button");
+      done.type = "button";
+      done.className = "onb-pop-done";
+      done.textContent = "Done";
+      done.onclick = () => closePops();
+      timeField.pop.append(wrap, done);
+    }
+    buildTimePop();
+    timeField.value.textContent = `${to12h(state.pickupTime)} \u2013 ${to12h(state.returnTime)}`;
+    timeField.value.classList.remove("placeholder");
+    const search = document.createElement("button");
+    search.type = "button";
+    search.className = "onb-search";
+    search.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><span>Search</span>';
+    bar.append(pickupSeg, dropoffSeg, dateField.seg, timeField.seg, search);
+    const error = document.createElement("div");
+    error.className = "onb-error";
+    root.appendChild(error);
+    const fleetBox = document.createElement("div");
+    fleetBox.className = "onb-fleet";
+    fleetBox.hidden = true;
+    root.appendChild(fleetBox);
+    const footer = document.createElement("div");
+    footer.className = "onb-footer";
+    footer.textContent = "Powered by 1Now";
+    root.appendChild(footer);
+    function applyToggle() {
+      sameBtn.setAttribute("aria-pressed", String(state.sameDropoff));
+      diffBtn.setAttribute("aria-pressed", String(!state.sameDropoff));
+      dropoffSeg.style.display = state.sameDropoff ? "none" : "";
+    }
+    sameBtn.onclick = () => {
+      state.sameDropoff = true;
+      applyToggle();
+    };
+    diffBtn.onclick = () => {
+      state.sameDropoff = false;
+      applyToggle();
+    };
+    applyToggle();
+    function closePops() {
+      dateField.pop.hidden = true;
+      timeField.pop.hidden = true;
+    }
+    function openPop(which) {
+      const isOpen = !which.hidden;
+      closePops();
+      which.hidden = isOpen;
+    }
+    dateField.seg.addEventListener("click", (e) => {
+      if (dateField.pop.contains(e.target)) return;
+      openPop(dateField.pop);
+    });
+    timeField.seg.addEventListener("click", (e) => {
+      if (timeField.pop.contains(e.target)) return;
+      openPop(timeField.pop);
+    });
+    document.addEventListener("click", (e) => {
+      const path = e.composedPath();
+      if (!path.includes(dateField.seg) && !path.includes(timeField.seg)) closePops();
+    });
+    search.onclick = () => {
+      error.textContent = "";
+      if (!cfg.companyId) {
+        error.textContent = "Configuration error: missing Company ID.";
+        return;
+      }
+      if (!state.pickupId) {
+        error.textContent = "Please choose a pick-up location.";
+        return;
+      }
+      if (!state.sameDropoff && !state.dropoffId) {
+        error.textContent = "Please choose a drop-off location.";
+        return;
+      }
+      if (!state.range.start || !state.range.end) {
+        error.textContent = "Please choose pick-up and drop-off dates.";
+        openPop(dateField.pop);
+        return;
+      }
+      const pickupLoc = pickupLocs.find((l) => String(l.id) === state.pickupId);
+      const dropLoc = state.sameDropoff ? pickupLoc : dropoffLocs.find((l) => String(l.id) === state.dropoffId);
+      const data = {
+        pickup_location_id: state.pickupId,
+        dropoff_location_id: state.sameDropoff ? state.pickupId : state.dropoffId,
+        pickup_location: (pickupLoc == null ? void 0 : pickupLoc.name) || (pickupLoc == null ? void 0 : pickupLoc.address) || "",
+        dropoff_location: (dropLoc == null ? void 0 : dropLoc.name) || (dropLoc == null ? void 0 : dropLoc.address) || "",
+        pickup_date: `${ymd(state.range.start)}T${state.pickupTime}`,
+        return_date: `${ymd(state.range.end)}T${state.returnTime}`
+      };
+      fireAnalytics(cfg, data);
+      const base = cfg.bookingUrl.replace(/\/+$/, "");
+      const path = cfg.bookingPath ? cfg.bookingPath.charAt(0) === "/" ? cfg.bookingPath : "/" + cfg.bookingPath : "";
+      const qs = Object.keys(data).filter((k) => data[k] !== "" && data[k] != null).map((k) => `${encodeURIComponent(k)}=${encodeURIComponent(data[k])}`).join("&");
+      const url = base + path + (qs ? "?" + qs : "");
+      opts.openUrl(url);
+    };
+    function getQuery() {
+      const p = {};
+      if (state.pickupId) {
+        p.pickup_location_id = state.pickupId;
+        p.dropoff_location_id = state.sameDropoff ? state.pickupId : state.dropoffId;
+      }
+      if (state.range.start && state.range.end) {
+        p.pickup_date = `${ymd(state.range.start)}T${state.pickupTime}`;
+        p.return_date = `${ymd(state.range.end)}T${state.returnTime}`;
+      }
+      return p;
+    }
+    opts.root.appendChild(root);
+    return { root, getQuery };
+  }
+  function fireAnalytics(cfg, data) {
+    var _a;
+    try {
+      const ph = window.posthog;
+      (_a = ph == null ? void 0 : ph.capture) == null ? void 0 : _a.call(ph, "booking_widget_search", {
+        company_id: cfg.companyId,
+        pickup_location_id: data.pickup_location_id,
+        dropoff_location_id: data.dropoff_location_id,
+        pickup_date: data.pickup_date,
+        return_date: data.return_date
+      });
+    } catch (e) {
+    }
+  }
+  var BONZAH_ICON = '<svg viewBox="0 0 24 24" fill="#c01c84" aria-hidden="true"><path d="M12 2c.9 2.7 2.9 4.7 5.6 5.6-2.7.9-4.7 2.9-5.6 5.6-.9-2.7-2.9-4.7-5.6-5.6C9.1 6.7 11.1 4.7 12 2z"/></svg>';
+  function renderFleetPreview(container, cfg, fleet, getQuery, openUrl) {
+    if (!fleet.length) {
+      container.hidden = true;
+      return;
+    }
+    container.hidden = false;
+    const img = (u) => {
+      if (!u) return "";
+      return /^https?:\/\//i.test(u) ? u : `${cfg.imageBase}/${u.replace(/^\/+/, "")}`;
+    };
+    const esc = (s) => String(s).replace(
+      /[&<>"']/g,
+      (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]
+    );
+    let visible = 8;
+    const card = (c) => {
+      var _a;
+      const price = (_a = c.avg_car_price_per_day) != null ? _a : c.price;
+      const name = c.name || [c.year, c.make, c.model].filter(Boolean).join(" ") || "Vehicle";
+      const meta = (c.seats ? `${c.seats} seats ` : "") + (c.color ? `<b>${esc(c.color)}</b> color` : "");
+      const thumb = img(c.thumbnail_photo_url);
+      const badge = c.has_bonzah_insurance ? `<div class="onb-badge">${BONZAH_ICON}Bonzah available</div>` : "";
+      return `<div class="onb-car"><div class="onb-car-imgwrap">` + (thumb ? `<img src="${esc(thumb)}" alt="" loading="lazy">` : `<div class="ph"></div>`) + badge + `</div><div class="onb-car-b"><div class="onb-car-n">${esc(name)}</div><div class="onb-car-m">${meta}</div>` + (price != null ? `<div class="onb-car-p">$${esc(price)} <span>/day</span></div>` : "") + `</div></div>`;
+    };
+    const nav = (url) => {
+      if (openUrl) openUrl(url);
+      else if (cfg.openInNewTab) window.open(url, "_blank", "noopener");
+      else window.location.href = url;
+    };
+    const goToEngine = () => {
+      const base = cfg.bookingUrl.replace(/\/+$/, "");
+      nav(`${base}/vehicles`);
+    };
+    const goToCar = (carId) => {
+      const base = cfg.bookingUrl.replace(/\/+$/, "");
+      const params = getQuery ? getQuery() : {};
+      params.selectedCarId = String(carId);
+      const qs = Object.keys(params).filter((k) => params[k] !== "" && params[k] != null).map((k) => `${encodeURIComponent(k)}=${encodeURIComponent(params[k])}`).join("&");
+      nav(`${base}/car-listing-detail?${qs}`);
+    };
+    const render = () => {
+      const shown = fleet.slice(0, visible);
+      const moreBtn = visible < fleet.length ? '<button type="button" data-act="more">View more</button>' : "";
+      container.innerHTML = `<div class="onb-fleet-head"><div class="onb-fleet-h">Explore All Vehicles (${fleet.length})</div></div><div class="onb-fleet-grid">${shown.map(card).join("")}</div><div class="onb-fleet-actions">${moreBtn}<button type="button" data-act="all">View all</button></div>`;
+      const more = container.querySelector('[data-act="more"]');
+      if (more) more.onclick = () => {
+        visible += 8;
+        render();
+      };
+      const all = container.querySelector('[data-act="all"]');
+      if (all) all.onclick = goToEngine;
+      const carEls = container.querySelectorAll(".onb-car");
+      carEls.forEach((el, i) => {
+        const c = shown[i];
+        if (c) el.onclick = () => goToCar(c.id);
+      });
+    };
+    render();
+  }
+
+  // src/styles.ts
+  var STYLES = `
 :host { all: initial; display: block; --onb-primary: 15,61,62; --onb-on-primary: 255,255,255; --onb-text: 31,41,55; --onb-font: 'Urbanist', system-ui, -apple-system, sans-serif; }
 *, *::before, *::after { box-sizing: border-box; }
 .onb-root { font-family: var(--onb-font); color: rgb(var(--onb-text)); width: 100%; }
@@ -89,4 +704,134 @@
   .onb-fleet-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
   .onb-fleet-h { font-size: 19px; }
 }
-`;(function(){"use strict";let t=document.currentScript||(()=>{let n=document.getElementsByTagName("script");return n[n.length-1]})(),e=Q(t);function a(n){let s=document.createElement("div");s.setAttribute("style","position:fixed;inset:0;z-index:2147483000;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;");let g=document.createElement("div");g.setAttribute("style","position:relative;width:100%;max-width:1120px;height:92vh;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 30px 90px rgba(0,0,0,.45);");let f=document.createElement("button");f.setAttribute("aria-label","Close"),f.textContent="\u2715",f.setAttribute("style","position:absolute;top:10px;right:12px;z-index:2;width:34px;height:34px;border:0;border-radius:50%;background:rgba(255,255,255,.92);box-shadow:0 2px 10px rgba(0,0,0,.25);font-size:15px;line-height:1;cursor:pointer;");let p=document.createElement("iframe");p.src=n,p.title="Book your vehicle",p.setAttribute("style","width:100%;height:100%;border:0;display:block;"),p.setAttribute("allow","payment *; clipboard-write");let l=()=>{s.remove(),document.removeEventListener("keydown",c)},c=b=>{b.key==="Escape"&&l()};f.onclick=l,s.addEventListener("click",b=>{b.target===s&&l()}),document.addEventListener("keydown",c),g.append(f,p),s.appendChild(g),document.body.appendChild(s)}function o(n){e.mode==="modal"?a(n):e.openInNewTab?window.open(n,"_blank","noopener"):window.location.href=n}function m(){let n=document.createElement("div");n.className="onb-host";let s=n.attachShadow?n.attachShadow({mode:"open"}):null,g=s!=null?s:n;if(s){let c=document.createElement("style");c.textContent=J,s.appendChild(c)}else if(!document.getElementById("onb-styles")){let c=document.createElement("style");c.id="onb-styles",c.textContent=J.replace(/:host/g,".onb-host"),document.head.appendChild(c)}let f=e.target?document.getElementById(e.target):null;if(f?f.appendChild(n):t&&t.parentNode?t.parentNode.insertBefore(n,t.nextSibling):document.body.appendChild(n),e.mode==="full"){let c=e.bookingUrl.replace(/\/+$/,""),b=document.createElement("iframe");b.src=`${c}/?company_id=${encodeURIComponent(e.companyId)}`,b.title="Book your vehicle",b.setAttribute("style","width:100%;height:90vh;min-height:560px;border:0;border-radius:14px;display:block;background:#fff;"),b.setAttribute("allow","payment *; clipboard-write"),g.appendChild(b);return}X(e).then(c=>{let b=ne(c);oe(n,b),re(b.font)}).catch(()=>{});let p=document.createElement("div");p.className="onb-root",p.style.cssText="padding:18px;font-family:var(--onb-font);color:rgba(var(--onb-text),.6);font-size:14px;",p.textContent="Loading booking\u2026",g.appendChild(p),Z(e).then(c=>{p.remove();let b=q({root:g,config:e,locations:c,openUrl:o});l(b.getQuery)}).catch(()=>{p.remove();let c=q({root:g,config:e,locations:[],openUrl:o});l(c.getQuery)});function l(c){if(!e.showFleet)return;let b=g.querySelector(".onb-fleet");b&&G(e).then(i=>se(b,e,i,c,o)).catch(()=>{})}}document.readyState==="loading"?document.addEventListener("DOMContentLoaded",m):m()})();})();
+`;
+
+  // src/widget.ts
+  (function() {
+    "use strict";
+    const scriptEl = document.currentScript || (() => {
+      const all = document.getElementsByTagName("script");
+      return all[all.length - 1];
+    })();
+    const config = resolveConfig(scriptEl);
+    function openModal(url) {
+      const overlay = document.createElement("div");
+      overlay.setAttribute(
+        "style",
+        "position:fixed;inset:0;z-index:2147483000;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;"
+      );
+      const panel = document.createElement("div");
+      panel.setAttribute(
+        "style",
+        "position:relative;width:100%;max-width:1120px;height:92vh;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 30px 90px rgba(0,0,0,.45);"
+      );
+      const closeBtn = document.createElement("button");
+      closeBtn.setAttribute("aria-label", "Close");
+      closeBtn.textContent = "\u2715";
+      closeBtn.setAttribute(
+        "style",
+        "position:absolute;top:10px;right:12px;z-index:2;width:34px;height:34px;border:0;border-radius:50%;background:rgba(255,255,255,.92);box-shadow:0 2px 10px rgba(0,0,0,.25);font-size:15px;line-height:1;cursor:pointer;"
+      );
+      const frame = document.createElement("iframe");
+      frame.src = url;
+      frame.title = "Book your vehicle";
+      frame.setAttribute("style", "width:100%;height:100%;border:0;display:block;");
+      frame.setAttribute("allow", "payment *; clipboard-write");
+      const close = () => {
+        overlay.remove();
+        document.removeEventListener("keydown", onKey);
+      };
+      const onKey = (e) => {
+        if (e.key === "Escape") close();
+      };
+      closeBtn.onclick = close;
+      overlay.addEventListener("click", (e) => {
+        if (e.target === overlay) close();
+      });
+      document.addEventListener("keydown", onKey);
+      panel.append(closeBtn, frame);
+      overlay.appendChild(panel);
+      document.body.appendChild(overlay);
+    }
+    function openUrl(url) {
+      if (config.mode === "modal") {
+        openModal(url);
+      } else {
+        if (config.openInNewTab) window.open(url, "_blank", "noopener");
+        else window.location.href = url;
+      }
+    }
+    function mount() {
+      const host = document.createElement("div");
+      host.className = "onb-host";
+      const shadow = host.attachShadow ? host.attachShadow({ mode: "open" }) : null;
+      const mountInto = shadow != null ? shadow : host;
+      if (shadow) {
+        const styleEl = document.createElement("style");
+        styleEl.textContent = STYLES;
+        shadow.appendChild(styleEl);
+      } else if (!document.getElementById("onb-styles")) {
+        const s = document.createElement("style");
+        s.id = "onb-styles";
+        s.textContent = STYLES.replace(/:host/g, ".onb-host");
+        document.head.appendChild(s);
+      }
+      const targetEl = config.target ? document.getElementById(config.target) : null;
+      if (targetEl) targetEl.appendChild(host);
+      else if (scriptEl && scriptEl.parentNode)
+        scriptEl.parentNode.insertBefore(host, scriptEl.nextSibling);
+      else document.body.appendChild(host);
+      if (config.mode === "full") {
+        const base = config.bookingUrl.replace(/\/+$/, "");
+        const frame = document.createElement("iframe");
+        frame.src = `${base}/?company_id=${encodeURIComponent(config.companyId)}`;
+        frame.title = "Book your vehicle";
+        frame.setAttribute(
+          "style",
+          "width:100%;height:90vh;min-height:560px;border:0;border-radius:14px;display:block;background:#fff;"
+        );
+        frame.setAttribute("allow", "payment *; clipboard-write");
+        mountInto.appendChild(frame);
+        return;
+      }
+      fetchTheme(config).then((details) => {
+        const theme = buildTheme(details);
+        applyTheme(host, theme);
+        ensureFont(theme.font);
+      }).catch(() => {
+      });
+      const loading = document.createElement("div");
+      loading.className = "onb-root";
+      loading.style.cssText = "padding:18px;font-family:var(--onb-font);color:rgba(var(--onb-text),.6);font-size:14px;";
+      loading.textContent = "Loading booking\u2026";
+      mountInto.appendChild(loading);
+      fetchLocations(config).then((locations) => {
+        loading.remove();
+        const view = renderWidget({ root: mountInto, config, locations, openUrl });
+        maybeFleet(view.getQuery);
+      }).catch(() => {
+        loading.remove();
+        const view = renderWidget({
+          root: mountInto,
+          config,
+          locations: [],
+          openUrl
+        });
+        maybeFleet(view.getQuery);
+      });
+      function maybeFleet(getQuery) {
+        if (!config.showFleet) return;
+        const box = mountInto.querySelector(".onb-fleet");
+        if (!box) return;
+        fetchFleet(config).then((fleet) => renderFleetPreview(box, config, fleet, getQuery, openUrl)).catch(() => {
+        });
+      }
+    }
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", mount);
+    } else {
+      mount();
+    }
+  })();
+})();
+//# sourceMappingURL=widget.js.map

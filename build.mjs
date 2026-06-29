@@ -1,5 +1,5 @@
 import * as esbuild from "esbuild";
-import { cpSync, mkdirSync, existsSync } from "node:fs";
+import { cpSync, mkdirSync, rmSync, existsSync } from "node:fs";
 
 const serve = process.argv.includes("--serve");
 
@@ -17,6 +17,8 @@ const options = {
   },
 };
 
+// Production build starts from a clean dist/ (drops stale files like old sourcemaps).
+if (!serve) rmSync("dist", { recursive: true, force: true });
 mkdirSync("dist", { recursive: true });
 
 /** Copy static assets (index.html, etc.) from public/ into dist/ so the

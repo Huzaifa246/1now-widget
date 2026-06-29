@@ -21,14 +21,36 @@ export function resolveConfig(scriptEl: HTMLScriptElement | null): WidgetConfig 
   const mode: WidgetConfig["mode"] =
     modeRaw === "full" ? "full" : modeRaw === "modal" ? "modal" : "page";
 
+  // Testing fallbacks: if the embedder didn't supply a company id or a booking
+  // URL, fall back to a known test company / QA booking site so the widget
+  // still works during QA — and warn loudly. These MUST be set for production
+  // (otherwise a real site that forgets them silently loads the test company
+  // and sends visitors to the QA site).
+  const TEST_COMPANY_ID = "233";
+  const TEST_BOOKING_URL = "https://qawebsitee.1now.app";
+  const companyIdGiven = attr("data-company-id", gstr("companyId"));
+  const bookingUrlGiven = attr("data-booking-url", gstr("bookingUrl"));
+  const companyId = companyIdGiven || TEST_COMPANY_ID;
+  const bookingUrl = bookingUrlGiven || TEST_BOOKING_URL;
+  if (!companyIdGiven) {
+    console.warn(
+      `[1Now widget] No company id set (data-company-id) — using TEST company ${TEST_COMPANY_ID}. Set your own company id before production.`,
+    );
+  }
+  if (!bookingUrlGiven) {
+    console.warn(
+      `[1Now widget] No booking URL set (data-booking-url) — using TEST site ${TEST_BOOKING_URL}. Set your booking URL before production.`,
+    );
+  }
+
   return {
-    companyId: attr("data-company-id", gstr("companyId")),
+    companyId,
     apiUrl: attr(
       "data-api-url",
       gstr("apiUrl") || "https://api-fleet-management.1now.app",
     ).replace(/\/+$/, ""),
     mode,
-    bookingUrl: attr("data-booking-url", gstr("bookingUrl") || "https://book.1now.ai"),
+    bookingUrl,
     bookingPath: attr("data-booking-path", gstr("bookingPath") || "/available-car"),
     target: attr("data-target", gstr("target")),
     showFleet: attr("data-show-fleet", gbool("showFleet")) === "true",

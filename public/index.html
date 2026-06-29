@@ -16,6 +16,7 @@
     pre { margin: 0; background: #0f172a; color: #e2e8f0; border-radius: 10px; padding: 16px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
     code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
     .muted { color: #9ca3af; font-size: 13px; margin-top: 10px; }
+    .note-warn { margin: 12px 0 0; padding: 10px 12px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; color: #92400e; font-size: 13px; }
   </style>
 </head>
 <body>
@@ -27,27 +28,46 @@
     <div class="card">
       <h2>Live demo</h2>
       <div id="onenow-booking-engine"></div>
-      <!-- Dynamic demo config: company_id / api_url / booking_url are read from
-           THIS page's own URL query (?company_id=&api_url=&booking_url=), with
-           defaults. Set on window.OneNowBookingConfig (which the widget reads)
-           BEFORE the deferred widget.js runs. -->
+      <div id="onb-demo-note" class="note-warn" hidden></div>
+      <!-- Dynamic demo config: company_id / api_url / booking_url come from THIS
+           page's own URL query (?company_id=&api_url=&booking_url=). Anything not
+           given falls back to the widget's TEST defaults (company 233 /
+           qawebsitee.1now.app), and the note below says so. Set on
+           window.OneNowBookingConfig BEFORE the deferred widget.js runs. -->
       <script>
         (function () {
           var q = new URLSearchParams(window.location.search);
-          window.OneNowBookingConfig = {
-            companyId: q.get("company_id") || "233",
-            apiUrl: q.get("api_url") || "https://api-fleet-management.1now.app",
-            bookingUrl: q.get("booking_url") || "https://book.1now.app",
-            bookingPath: q.get("booking_path") || "/available-car",
-            mode: q.get("mode") || "page",
+          var cfg = {
             target: "onenow-booking-engine",
             title: "Book your vehicle",
             showFleet: true,
+            mode: q.get("mode") || "page",
+            bookingPath: q.get("booking_path") || "/available-car",
           };
+          // Only set these when provided — otherwise the widget applies its own
+          // test defaults (and logs a console warning).
+          if (q.get("company_id")) cfg.companyId = q.get("company_id");
+          if (q.get("api_url")) cfg.apiUrl = q.get("api_url");
+          if (q.get("booking_url")) cfg.bookingUrl = q.get("booking_url");
+          window.OneNowBookingConfig = cfg;
+
+          // Visible note when test defaults are in use.
+          var missing = [];
+          if (!q.get("company_id")) missing.push("company 233 (test)");
+          if (!q.get("booking_url")) missing.push("qawebsitee.1now.app (test booking site)");
+          if (missing.length) {
+            var n = document.getElementById("onb-demo-note");
+            n.hidden = false;
+            n.textContent =
+              "Note: no " +
+              (missing.length === 2 ? "company id or booking URL" : "company id / booking URL") +
+              " provided — using " + missing.join(" and ") +
+              ". Add ?company_id=… and/or ?booking_url=… to the page URL to override.";
+          }
         })();
       </script>
       <script src="./widget.js" defer></script>
-      <p class="muted">Dynamic: append <code>?company_id=605</code> (and optionally <code>&amp;api_url=…</code> / <code>&amp;booking_url=…</code>) to this page's URL to demo any company or environment. Defaults to company <code>233</code> on production.</p>
+      <p class="muted">Dynamic: append <code>?company_id=605</code> (and optionally <code>&amp;api_url=…</code> / <code>&amp;booking_url=…</code>) to this page's URL to demo any company or environment. With nothing set it uses the test defaults above.</p>
     </div>
 
     <!-- Embed instructions -->
