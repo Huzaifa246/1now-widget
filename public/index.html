@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>1Now Booking Widget</title>
+  <meta name="description" content="Embeddable 1Now booking widget — one script tag, any website." />
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #1f2937; background: #f7f8fa; }
+    .wrap { max-width: 960px; margin: 0 auto; padding: 48px 20px 80px; }
+    h1 { font-size: 30px; margin: 0 0 6px; }
+    .sub { color: #6b7280; font-size: 16px; margin: 0 0 32px; }
+    .card { background: #fff; border: 1px solid #e5e7eb; border-radius: 14px; padding: 22px; margin-bottom: 24px; box-shadow: 0 4px 16px rgba(0,0,0,.04); }
+    h2 { font-size: 15px; text-transform: uppercase; letter-spacing: .05em; color: #6b7280; margin: 0 0 14px; }
+    pre { margin: 0; background: #0f172a; color: #e2e8f0; border-radius: 10px; padding: 16px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .muted { color: #9ca3af; font-size: 13px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>1Now Booking Widget</h1>
+    <p class="sub">One script tag turns any website into a company-scoped booking entry point.</p>
+
+    <!-- Live demo -->
+    <div class="card">
+      <h2>Live demo</h2>
+      <div id="onenow-booking-engine"></div>
+      <!-- Dynamic demo config: company_id / api_url / booking_url are read from
+           THIS page's own URL query (?company_id=&api_url=&booking_url=), with
+           defaults. Set on window.OneNowBookingConfig (which the widget reads)
+           BEFORE the deferred widget.js runs. -->
+      <script>
+        (function () {
+          var q = new URLSearchParams(window.location.search);
+          window.OneNowBookingConfig = {
+            companyId: q.get("company_id") || "233",
+            apiUrl: q.get("api_url") || "https://api-fleet-management.1now.app",
+            bookingUrl: q.get("booking_url") || "https://book.1now.app",
+            bookingPath: q.get("booking_path") || "/available-car",
+            mode: q.get("mode") || "page",
+            target: "onenow-booking-engine",
+            title: "Book your vehicle",
+            showFleet: true,
+          };
+        })();
+      </script>
+      <script src="./widget.js" defer></script>
+      <p class="muted">Dynamic: append <code>?company_id=605</code> (and optionally <code>&amp;api_url=…</code> / <code>&amp;booking_url=…</code>) to this page's URL to demo any company or environment. Defaults to company <code>233</code> on production.</p>
+    </div>
+
+    <!-- Embed instructions -->
+    <div class="card">
+      <h2>Add it to your site</h2>
+      <pre><code>&lt;div id="onenow-booking-engine"&gt;&lt;/div&gt;
+&lt;script
+  src="https://cdn.1now.ai/booking-widget/v1/widget.js"
+  data-company-id="YOUR_COMPANY_ID"
+  data-booking-url="https://book.1now.app"
+  data-target="onenow-booking-engine"
+  defer&gt;&lt;/script&gt;</code></pre>
+      <p class="muted">Optional: <code>data-mode="modal"|"full"</code>, <code>data-booking-path</code>, <code>data-title</code>, <code>data-show-fleet="true"</code>, <code>data-target-blank="true"</code>.</p>
+    </div>
+  </div>
+</body>
+</html>
