@@ -52,8 +52,12 @@ export function resolveConfig(scriptEl: HTMLScriptElement | null): WidgetConfig 
     mode,
     bookingUrl,
     bookingPath: attr("data-booking-path", gstr("bookingPath") || "/available-car"),
+    selectedCarId: attr("data-fleet-id", gstr("fleetId")),
     target: attr("data-target", gstr("target")),
-    showFleet: attr("data-show-fleet", gbool("showFleet")) === "true",
+    // Only show the vehicle list when a real company id was provided — never on
+    // the test fallback (otherwise it would dump the test company's fleet).
+    showFleet:
+      attr("data-show-fleet", gbool("showFleet")) === "true" && !!companyIdGiven,
     openInNewTab: attr("data-target-blank", gbool("openInNewTab")) === "true",
     title: attr("data-title", gstr("title")),
     imageBase: attr(

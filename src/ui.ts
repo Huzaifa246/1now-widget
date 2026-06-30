@@ -292,13 +292,17 @@ export function renderWidget(opts: {
       pickup_date: `${ymd(state.range.start)}T${state.pickupTime}`,
       return_date: `${ymd(state.range.end)}T${state.returnTime}`,
     };
+    // Scoped to a specific car (data-fleet-id) → go straight to that car's
+    // detail page; otherwise to the results list (bookingPath).
+    if (cfg.selectedCarId) data.selectedCarId = cfg.selectedCarId;
     fireAnalytics(cfg, data);
 
     const base = cfg.bookingUrl.replace(/\/+$/, "");
-    const path = cfg.bookingPath
-      ? cfg.bookingPath.charAt(0) === "/"
-        ? cfg.bookingPath
-        : "/" + cfg.bookingPath
+    const rawPath = cfg.selectedCarId ? "/car-listing-detail" : cfg.bookingPath;
+    const path = rawPath
+      ? rawPath.charAt(0) === "/"
+        ? rawPath
+        : "/" + rawPath
       : "";
     const qs = Object.keys(data)
       .filter((k) => data[k] !== "" && data[k] != null)

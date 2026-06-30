@@ -4,75 +4,95 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>1Now Booking Widget</title>
-  <meta name="description" content="Embeddable 1Now booking widget — one script tag, any website." />
+  <meta name="description" content="Add a car-rental booking bar to any website with one line of code." />
   <style>
+    :root { --ink:#0f172a; --muted:#64748b; --line:#e9edf2; --accent:#fe7743; --bg:#f5f7fa; }
     * { box-sizing: border-box; }
-    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #1f2937; background: #f7f8fa; }
-    .wrap { max-width: 960px; margin: 0 auto; padding: 48px 20px 80px; }
-    h1 { font-size: 30px; margin: 0 0 6px; }
-    .sub { color: #6b7280; font-size: 16px; margin: 0 0 32px; }
-    .card { background: #fff; border: 1px solid #e5e7eb; border-radius: 14px; padding: 22px; margin-bottom: 24px; box-shadow: 0 4px 16px rgba(0,0,0,.04); }
-    h2 { font-size: 15px; text-transform: uppercase; letter-spacing: .05em; color: #6b7280; margin: 0 0 14px; }
-    pre { margin: 0; background: #0f172a; color: #e2e8f0; border-radius: 10px; padding: 16px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+    html, body { margin: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+      color: var(--ink);
+      background: radial-gradient(1100px 460px at 50% -180px, #ffffff, var(--bg));
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap { max-width: 760px; margin: 0 auto; padding: 52px 20px 88px; }
+    .brand { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 26px; }
+    .brand .mark { width: 30px; height: 30px; border-radius: 9px; background: var(--accent); color: #fff; font-weight: 800; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+    .brand b { font-size: 15px; }
+    h1 { font-size: clamp(27px, 5vw, 40px); line-height: 1.1; letter-spacing: -0.02em; text-align: center; margin: 0 0 12px; }
+    .lead { text-align: center; color: var(--muted); font-size: 17px; line-height: 1.55; max-width: 500px; margin: 0 auto 40px; }
+    .card { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 24px; box-shadow: 0 14px 44px rgba(15,23,42,.06); margin-bottom: 22px; }
+    .label { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 18px; }
+    .note { display: flex; gap: 10px; align-items: flex-start; background: #fff7ed; border: 1px solid #fed7aa; color: #9a3412; border-radius: 12px; padding: 12px 14px; font-size: 13px; line-height: 1.5; margin-top: 18px; }
+    .note svg { flex: none; margin-top: 1px; }
+    .steps { margin: 0 0 18px; padding: 0; list-style: none; counter-reset: s; }
+    .steps li { position: relative; padding-left: 32px; margin-bottom: 11px; font-size: 15px; line-height: 1.4; }
+    .steps li:last-child { margin-bottom: 0; }
+    .steps li::before { counter-increment: s; content: counter(s); position: absolute; left: 0; top: 0; width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+    .steps code { background: #eef1f5; padding: 1px 6px; border-radius: 5px; font-size: 13px; }
+    pre { margin: 18px 0 0; background: #0f172a; color: #e2e8f0; border-radius: 12px; padding: 18px; overflow-x: auto; font-size: 13px; line-height: 1.6; }
     code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
-    .muted { color: #9ca3af; font-size: 13px; margin-top: 10px; }
-    .note-warn { margin: 12px 0 0; padding: 10px 12px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; color: #92400e; font-size: 13px; }
+    .hint { color: var(--muted); font-size: 13px; line-height: 1.6; margin: 14px 0 0; }
+    .hint code { background: #eef1f5; padding: 1px 6px; border-radius: 5px; font-size: 12px; }
+    footer { text-align: center; color: #94a3b8; font-size: 12px; margin-top: 34px; }
+    footer a { color: #94a3b8; }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>1Now Booking Widget</h1>
-    <p class="sub">One script tag turns any website into a company-scoped booking entry point.</p>
+    <div class="brand"><span class="mark">1</span><b>1Now</b></div>
+    <h1>Let customers book a car<br />right from your website</h1>
+    <p class="lead">Add the 1Now booking bar to any site with a single line of code — your customers search, browse and book without ever leaving your page.</p>
 
     <!-- Live demo -->
     <div class="card">
-      <h2>Live demo</h2>
+      <p class="label">Try it</p>
       <div id="onenow-booking-engine"></div>
-      <div id="onb-demo-note" class="note-warn" hidden></div>
-      <!-- Dynamic demo config: company_id / api_url / booking_url come from THIS
-           page's own URL query (?company_id=&api_url=&booking_url=). Anything not
-           given falls back to the widget's TEST defaults (company 233 /
-           qawebsitee.1now.app), and the note below says so. Set on
-           window.OneNowBookingConfig BEFORE the deferred widget.js runs. -->
+      <div id="onb-demo-note" class="note" hidden>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        <span id="onb-demo-note-text"></span>
+      </div>
+      <!-- Demo config is read from THIS page's own URL query, with test
+           fallbacks. Set on window.OneNowBookingConfig before widget.js runs. -->
       <script>
         (function () {
           var q = new URLSearchParams(window.location.search);
           var cfg = {
             target: "onenow-booking-engine",
             title: "Book your vehicle",
-            showFleet: true,
             mode: q.get("mode") || "page",
             bookingPath: q.get("booking_path") || "/available-car",
+            // Only show the vehicle list when a real company id is provided.
+            showFleet: !!q.get("company_id"),
           };
-          // Only set these when provided — otherwise the widget applies its own
-          // test defaults (and logs a console warning).
           if (q.get("company_id")) cfg.companyId = q.get("company_id");
           if (q.get("api_url")) cfg.apiUrl = q.get("api_url");
           if (q.get("booking_url")) cfg.bookingUrl = q.get("booking_url");
+          if (q.get("fleet_id")) cfg.fleetId = q.get("fleet_id"); // "book this car"
           window.OneNowBookingConfig = cfg;
 
-          // Visible note when test defaults are in use.
           var missing = [];
           if (!q.get("company_id")) missing.push("company 233 (test)");
           if (!q.get("booking_url")) missing.push("qawebsitee.1now.app (test booking site)");
           if (missing.length) {
-            var n = document.getElementById("onb-demo-note");
-            n.hidden = false;
-            n.textContent =
-              "Note: no " +
-              (missing.length === 2 ? "company id or booking URL" : "company id / booking URL") +
-              " provided — using " + missing.join(" and ") +
-              ". Add ?company_id=… and/or ?booking_url=… to the page URL to override.";
+            document.getElementById("onb-demo-note").hidden = false;
+            document.getElementById("onb-demo-note-text").textContent =
+              "No company id or booking URL set — using " + missing.join(" and ") +
+              ". Add ?company_id=… (and ?booking_url=…) to this page's URL to override.";
           }
         })();
       </script>
       <script src="./widget.js" defer></script>
-      <p class="muted">Dynamic: append <code>?company_id=605</code> (and optionally <code>&amp;api_url=…</code> / <code>&amp;booking_url=…</code>) to this page's URL to demo any company or environment. With nothing set it uses the test defaults above.</p>
     </div>
 
-    <!-- Embed instructions -->
+    <!-- Embed -->
     <div class="card">
-      <h2>Add it to your site</h2>
+      <p class="label">Add it to your site</p>
+      <ol class="steps">
+        <li>Copy the snippet below.</li>
+        <li>Paste it into your website where the booking bar should appear.</li>
+        <li>Replace <code>YOUR_COMPANY_ID</code> with your 1Now company ID.</li>
+      </ol>
       <pre><code>&lt;div id="onenow-booking-engine"&gt;&lt;/div&gt;
 &lt;script
   src="https://cdn.1now.ai/booking-widget/v1/widget.js"
@@ -80,8 +100,10 @@
   data-booking-url="https://book.1now.app"
   data-target="onenow-booking-engine"
   defer&gt;&lt;/script&gt;</code></pre>
-      <p class="muted">Optional: <code>data-mode="modal"|"full"</code>, <code>data-booking-path</code>, <code>data-title</code>, <code>data-show-fleet="true"</code>, <code>data-target-blank="true"</code>.</p>
+      <p class="hint">Optional: <code>data-show-fleet="true"</code> (show the vehicle list), <code>data-fleet-id="123"</code> (book one specific car), <code>data-mode="modal"</code>, <code>data-title</code>.</p>
     </div>
+
+    <footer>Powered by <a href="https://1now.ai">1Now</a></footer>
   </div>
 </body>
 </html>

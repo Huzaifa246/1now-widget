@@ -43,6 +43,13 @@ export interface WidgetConfig {
   bookingUrl: string;
   /** Path appended to bookingUrl (the engine results route). */
   bookingPath: string;
+  /**
+   * Optional specific vehicle id (data-fleet-id). When set, the widget is a
+   * "book this car" entry: Search goes straight to that car's detail page
+   * (maps to the booking app's `selectedCarId`) with the chosen dates/location,
+   * instead of the results list.
+   */
+  selectedCarId: string;
   /** Id of the element to render into (else inserted after the script tag). */
   target: string;
   /** Show a live fleet preview under the bar. */
